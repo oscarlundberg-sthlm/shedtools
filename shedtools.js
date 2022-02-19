@@ -1,12 +1,13 @@
-
+// "use strict";
 
 // Next thing:
 // measurements? distances?
-// color changer HSL
 // toggle vertical grid-lines
 // maybe only being able to lock one?
 
 
+
+let toolsAreActive = false;
 
 const createPseudoBody = () => {
     const documentElRect = document.documentElement.getBoundingClientRect();
@@ -32,13 +33,24 @@ const createSettingsBar = () => {
     let s = barEl.style;
 
     s.background = '#202020';
+    s.border = '1px solid #EEEEEE';
     s.color = '#EEEEEE';
     s.position = 'fixed';
     s.zIndex = 10000001;
     s.bottom = 0;
     s.left = 0;
-    s.width = '100%';
-    s.height = '3em';
+    s.borderTopRightRadius = '5px';
+    s.padding = '6px';
+
+    const createOnOff = () => {
+        let onOffEl = document.createElement('input');
+        onOffEl.type = 'checkbox';
+        onOffEl.id = 'shed_tools_-_settings_-_on_off';
+        onOffEl.style.verticalAlign = 'middle';
+
+        return onOffEl;
+    }
+    const onOff = createOnOff();
 
     const createColorSlider = () => {
         let sliderEl = document.createElement('input');
@@ -47,11 +59,13 @@ const createSettingsBar = () => {
         sliderEl.max = 360;
         sliderEl.value = 180;
         sliderEl.id = 'shed_tools_-_settings_-_color_slider';
+        sliderEl.style.verticalAlign = 'middle';;
 
         return sliderEl;
     }
     const colorSlider = createColorSlider();
 
+    barEl.appendChild(onOff);
     barEl.appendChild(colorSlider);
     document.body.appendChild(barEl);
 
@@ -61,14 +75,14 @@ const settingsBar = createSettingsBar();
 
 
 let overlayColors = {
-    marginBox: `hsla(${180}, 100%, 50%, 0.6)`,
-    paddingBox: `hsla(${180 + 60}, 100%, 50%, 0.4)`,
-    contentBox: `hsla(${180 + 120}, 100%, 50%, 0.2)`,
+    marginBox: `hsla(${180}, 100%, 50%, 1)`,
+    paddingBox: `hsla(${180 + 120}, 100%, 50%, 1)`,
+    contentBox: `hsla(${180 + 240}, 100%, 50%, 1)`,
     setHue: function(num) {
-        let numB = 60;
-        let numC = numB * 2;
+        num = parseInt(num);
+        let numB = 120;
         let pBoxHue = num + numB;
-        let cBoxHue = num + numC;
+        let cBoxHue = num + (numB * 2);
 
         if (pBoxHue > 360) {
             pBoxHue -= 360;
@@ -76,9 +90,9 @@ let overlayColors = {
         if (cBoxHue > 360) {
             cBoxHue -= 360;
         }
-        this.marginBox = `hsla(${num}, 100%, 50%, 0.6)`;
-        this.paddingBox = `hsla(${pBoxHue}, 100%, 50%, 0.4)`;
-        this.contentBox = `hsla(${cBoxHue}, 100%, 50%, 0.2)`;
+        this.marginBox = `hsla(${num}, 100%, 50%, 1)`;
+        this.paddingBox = `hsla(${pBoxHue}, 100%, 50%, 1)`;
+        this.contentBox = `hsla(${cBoxHue}, 100%, 50%, 1)`;
     }
 }
 
@@ -102,17 +116,21 @@ const getOverlayEl = (currentTarget) => {
     wrapperEl.style.top = elRect.top + window.scrollY  + 'px';
     wrapperEl.style.left = elRect.left + window.scrollX + 'px';
     wrapperEl.style.background = 'transparent';
+    wrapperEl.style.opacity = '.5';
     wrapperEl.id = wrapperId;
+
+    let transition = 'all .5s ease';
 
     let marginBoxDiv = document.createElement('div');
     marginBoxDiv.style.background = overlayColors.marginBox;
     marginBoxDiv.style.position = 'absolute';
+    marginBoxDiv.style.zIndex = -1;
     marginBoxDiv.style.top = '-' + marginTop;
     marginBoxDiv.style.right = '-' + marginRight;
     marginBoxDiv.style.bottom = '-' + marginBottom;
     marginBoxDiv.style.left = '-' + marginLeft;
     marginBoxDiv.innerText = 'm';
-    marginBoxDiv.style.transition = 'all .1s ease';
+    marginBoxDiv.style.transition = transition;
     
     let paddingBoxDiv = document.createElement('div');
     paddingBoxDiv.id = innerId;
@@ -120,18 +138,19 @@ const getOverlayEl = (currentTarget) => {
     paddingBoxDiv.style.width = currentTarget.clientWidth + 'px';
     paddingBoxDiv.style.height = currentTarget.clientHeight + 'px';
     paddingBoxDiv.innerText = '.p';
-    paddingBoxDiv.style.transition = 'all .1s ease';
+    paddingBoxDiv.style.transition = transition;
     // paddingBoxDiv.style.pointerEvents = 'auto';
 
     let contentBoxDiv = document.createElement('div');
     contentBoxDiv.style.position = 'absolute';
+    contentBoxDiv.style.zIndex = 1;
     contentBoxDiv.style.top = paddingTop;
     contentBoxDiv.style.right = paddingRight;
     contentBoxDiv.style.bottom = paddingBottom;
     contentBoxDiv.style.left = paddingLeft;
     contentBoxDiv.style.background = overlayColors.contentBox;
     contentBoxDiv.innerText = '..c';
-    contentBoxDiv.style.transition = 'all .1s ease';
+    contentBoxDiv.style.transition = transition;
 
     wrapperEl.classList.add('shed_tools_-_overlay', 'shed_tools_-_overlay_wrapper');
     paddingBoxDiv.classList.add('shed_tools_-_overlay', 'shed_tools_-_overlay_inner');
@@ -184,6 +203,11 @@ let mousingOver = {
 
 document.body.addEventListener('mousemove', e => {
     e.stopPropagation();
+
+    if (!toolsAreActive) {
+        return;
+    }
+
     let mouseTarget = e.target;
 
     mousingOver.now = mouseTarget;
@@ -199,6 +223,10 @@ const lockKey = 'IntlBackslash';
 
 document.body.addEventListener('keydown', e => {
     e.stopPropagation();
+
+    if (!toolsAreActive) {
+        return;
+    }
 
     let overlay = mousingOver.now.shed_tools_overlay;
     
@@ -218,4 +246,13 @@ settingsBar.querySelector('#shed_tools_-_settings_-_color_slider')
             overlay.children.item(1).style.background = overlayColors.paddingBox;
             overlay.children.item(2).style.background = overlayColors.contentBox;
         }
+    })
+
+settingsBar.querySelector('#shed_tools_-_settings_-_on_off')
+    .addEventListener('input', e => {
+        toolsAreActive = e.target.checked;
+
+        toolsAreActive ?
+        shedToolsContainer.style.display = 'block' :
+        shedToolsContainer.style.display = 'none';
     })
