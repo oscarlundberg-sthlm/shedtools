@@ -1,0 +1,31 @@
+* {
+    background-clip: content-box;
+}
+
+.section {
+    margin: 50px 100px;
+    padding: 40px;
+    background: palegoldenrod;
+    min-height: 500px;
+}
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 70px;
+    margin: 30px;
+    height: 400px;
+    position: relative;
+    background: palevioletred;
+}
+.row:first-child {
+    position: relative;
+    right: -300px;
+}
+.module {
+    margin: 30px;
+    width: 33.3333%;
+    height: 100%;
+    /* visibility: hidden; */
+    background: paleturquoise;
+}
