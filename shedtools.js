@@ -99,13 +99,15 @@ createStyles();
 
 let overlayColors = {
     marginBox: `hsla(${180}, 100%, 50%, 1)`,
-    paddingBox: `hsla(${180 + 120}, 100%, 50%, 1)`,
-    contentBox: `hsla(${180 + 240}, 100%, 50%, 1)`,
+    paddingBox: `hsla(${180 + 90}, 100%, 50%, 1)`,
+    contentBox: `hsla(${180 + 180}, 100%, 50%, 1)`,
+    lineColor: `hsla(${180 + 270}, 100%, 50%, 1)`,
     setHue: function(num) {
         num = parseInt(num);
-        let numB = 120;
+        let numB = 90;
         let pBoxHue = num + numB;
         let cBoxHue = num + (numB * 2);
+        let lineHue = num + (numB * 3);
 
         if (pBoxHue > 360) {
             pBoxHue -= 360;
@@ -113,9 +115,13 @@ let overlayColors = {
         if (cBoxHue > 360) {
             cBoxHue -= 360;
         }
+        if (lineHue > 360) {
+            lineHue -= 360;
+        }
         this.marginBox = `hsla(${num}, 100%, 50%, 1)`;
         this.paddingBox = `hsla(${pBoxHue}, 100%, 50%, 1)`;
         this.contentBox = `hsla(${cBoxHue}, 100%, 50%, 1)`;
+        this.lineColor = `hsla(${lineHue}, 100%, 50%, 1)`;
     }
 }
 
@@ -219,10 +225,71 @@ const toggleOverlay = (a, b) => {
 
 }
 
+
+const createMeasurementLine = () => {
+    let line = document.createElement('div');
+    let s = line.style;
+    let isVertical = null;
+    let lineHeight = '200px'; // calculate correct
+    let lineWidth = '200px'; // calculate correct
+
+    s.background = overlayColors.lineColor;
+    s.height = isVertical ? lineHeight : '2px';
+    s.width = !isVertical ? lineWidth : '2px';
+    s.position = 'absolute';
+    s.top = '0px'; // calculate
+    s.left = '0px'; // calculate
+
+    let lineInner = document.createElement('div');
+    lineInner.style.position = relative;
+
+    let text = document.createElement('p');
+    text.textContent = isVertical ? lineHeight + 'px' : lineWidth + 'px';
+    let ts = text.style;
+    ts.position = 'absolute';
+    ts.top = '50%';
+    ts.left = '50%';
+    ts.transform = 'translate(-50%, -50%)';
+    ts.background = '#FFFFFF';
+    ts.color = '#202020';
+    
+}
+const displayMeasurements = (lockedEl, mouseOverEl) => {
+    if (!mousingOver || !lockedEl) {
+        return;
+    }
+    lockedElRect = lockedEl.getBoundingClientRect();
+    mouseOverElRect = mouseOverEl.getBoundingClientRect();
+    if (lockedElRect.top === mouseOverElRect.top &&
+        lockedElRect.right === mouseOverElRect.right &&
+        lockedElRect.bottom === mouseOverElRect.bottom &&
+        lockedElRect.left === mouseOverElRect.left
+    ) {
+        return;
+    }
+    // console.log('lockedElRect', lockedElRect);
+    // console.log('mouseOverElRect', mouseOverElRect);
+    if (mouseOverElRect.bottom < lockedElRect.top) {
+        console.log('above');
+    }
+    if (mouseOverElRect.top > lockedElRect.bottom) {
+        console.log('below');
+    }
+    if (mouseOverElRect.right < lockedElRect.left) {
+        console.log('to the left');
+    }
+    if (mouseOverElRect.left > lockedElRect.right) {
+        console.log('to the right');
+    }
+}
+
+
+
 let mousingOver = {
     now: undefined,
     last: undefined
 }
+let lockedEl = null; // limit locked els to 1 el
 
 document.body.addEventListener('mousemove', e => {
     e.stopPropagation();
@@ -237,6 +304,7 @@ document.body.addEventListener('mousemove', e => {
 
     if (mousingOver.last !== undefined) {
         toggleOverlay(mousingOver.now, mousingOver.last);
+        displayMeasurements(lockedEl, mousingOver.now);
     }
 
     mousingOver.last = mouseTarget;
@@ -244,7 +312,6 @@ document.body.addEventListener('mousemove', e => {
 
 // LOCKING
 const lockKey = 'IntlBackslash';
-let lockedEl = null; // limit locked els to 1 el
 
 document.body.addEventListener('keydown', e => {
     e.stopPropagation();
