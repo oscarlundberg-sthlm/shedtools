@@ -267,6 +267,10 @@ const displayMeasurements = (lockedEl, mouseOverEl) => {
     ) {
         return;
     }
+
+    // Use a combination of direction and distance
+    let distanceX, distanceY;
+    
     // console.log('lockedElRect', lockedElRect);
     // console.log('mouseOverElRect', mouseOverElRect);
     if (mouseOverElRect.bottom < lockedElRect.top) {
