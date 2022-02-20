@@ -33,7 +33,8 @@ const createSettingsBar = () => {
     let s = barEl.style;
 
     s.background = '#202020';
-    s.border = '1px solid #EEEEEE';
+    s.borderTop = '1px solid #EEEEEE';
+    s.borderRight = '1px solid #EEEEEE';
     s.color = '#EEEEEE';
     s.position = 'fixed';
     s.zIndex = 10000001;
@@ -72,6 +73,22 @@ const createSettingsBar = () => {
     return barEl;
 }
 const settingsBar = createSettingsBar();
+
+
+// Create some styles
+const createStyles = () => {
+    let style = document.createElement('style');
+    style.textContent = `
+        .shed_tools_-_locked_overlay :last-child::after {
+            content: ' [locked]';
+            font-weight: 600;
+            background: whitesmoke;
+            color: #202020;
+        }
+    `;
+    document.head.append(style);
+}
+createStyles();
 
 
 let overlayColors = {
@@ -119,7 +136,7 @@ const getOverlayEl = (currentTarget) => {
     wrapperEl.style.opacity = '.5';
     wrapperEl.id = wrapperId;
 
-    let transition = 'all .5s ease';
+    let transition = 'all .1s ease';
 
     let marginBoxDiv = document.createElement('div');
     marginBoxDiv.style.background = overlayColors.marginBox;
@@ -219,7 +236,9 @@ document.body.addEventListener('mousemove', e => {
     mousingOver.last = mouseTarget;
 })
 
+// LOCKING
 const lockKey = 'IntlBackslash';
+let lockedEl = null; // limit locked els to 1 el
 
 document.body.addEventListener('keydown', e => {
     e.stopPropagation();
@@ -231,7 +250,14 @@ document.body.addEventListener('keydown', e => {
     let overlay = mousingOver.now.shed_tools_overlay;
     
     if (e.code === lockKey) {
-        overlay.classList.toggle('shed_tools_-_locked_overlay');
+        if (lockedEl === overlay) {
+            overlay.classList.remove('shed_tools_-_locked_overlay');
+            lockedEl = undefined;
+        } else
+        if (!lockedEl) {
+            overlay.classList.add('shed_tools_-_locked_overlay');
+            lockedEl = overlay;
+        }
     }
 })
 
