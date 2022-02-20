@@ -30,6 +30,7 @@ const shedToolsContainer = createPseudoBody();
 // Create bar for settings
 const createSettingsBar = () => {
     let barEl = document.createElement('div');
+    barEl.id = 'shed_tools_-_settings_bar';
     let s = barEl.style;
 
     s.background = '#202020';
@@ -79,11 +80,16 @@ const settingsBar = createSettingsBar();
 const createStyles = () => {
     let style = document.createElement('style');
     style.textContent = `
+        #shed_tools_-_settings_bar input {
+            all: revert;
+        }
+        #shed_tools_-_pseudo_body {
+            font-family: monospace;
+            font-size: 12px;
+        }
         .shed_tools_-_locked_overlay :last-child::after {
-            content: ' [locked]';
+            content: '[locked]';
             font-weight: 600;
-            background: whitesmoke;
-            color: #202020;
         }
     `;
     document.head.append(style);
@@ -146,7 +152,7 @@ const getOverlayEl = (currentTarget) => {
     marginBoxDiv.style.right = '-' + marginRight;
     marginBoxDiv.style.bottom = '-' + marginBottom;
     marginBoxDiv.style.left = '-' + marginLeft;
-    marginBoxDiv.innerText = 'm';
+    marginBoxDiv.innerText = 'margin';
     marginBoxDiv.style.transition = transition;
     
     let paddingBoxDiv = document.createElement('div');
@@ -154,7 +160,7 @@ const getOverlayEl = (currentTarget) => {
     paddingBoxDiv.style.background = overlayColors.paddingBox;
     paddingBoxDiv.style.width = currentTarget.clientWidth + 'px';
     paddingBoxDiv.style.height = currentTarget.clientHeight + 'px';
-    paddingBoxDiv.innerText = '.p';
+    paddingBoxDiv.innerText = 'padding';
     paddingBoxDiv.style.transition = transition;
     // paddingBoxDiv.style.pointerEvents = 'auto';
 
@@ -166,7 +172,7 @@ const getOverlayEl = (currentTarget) => {
     contentBoxDiv.style.bottom = paddingBottom;
     contentBoxDiv.style.left = paddingLeft;
     contentBoxDiv.style.background = overlayColors.contentBox;
-    contentBoxDiv.innerText = '..c';
+    contentBoxDiv.innerText = 'content';
     contentBoxDiv.style.transition = transition;
 
     wrapperEl.classList.add('shed_tools_-_overlay', 'shed_tools_-_overlay_wrapper');
