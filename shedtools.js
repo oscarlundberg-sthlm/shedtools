@@ -91,11 +91,41 @@ const createStyles = () => {
             content: '[locked]';
             font-weight: 600;
         }
+        .shed_tools_-_vertical_grid_-_column {
+            background: #ff00003d;
+        }
     `;
     document.head.append(style);
 }
 createStyles();
 
+const createVerticalGrid = (columnCount, columnWidth, gutterWidth) => {
+    let gridContainer = document.createElement('div');
+    let gs = gridContainer.style;
+    gs.display = 'flex';
+    gs.justifyContent = 'center';
+    gs.position = 'fixed';
+    gs.zIndex = 10000000;
+    gs.inset = 0;
+    gs.pointerEvents = 'none';
+
+    let gridContainerInner = document.createElement('div');
+    gridContainerInner.style.display = 'flex';
+
+    for (let i = 0; i < columnCount; i++) {
+        let column = document.createElement('div');
+        column.classList.add('shed_tools_-_vertical_grid_-_column');
+        let cs = column.style;
+        cs.margin = `0 ${gutterWidth / 2}px`;
+        cs.width = columnWidth + 'px';
+        cs.height = '100%';
+
+        gridContainerInner.append(column);
+    }
+
+    gridContainer.append(gridContainerInner);
+    document.body.append(gridContainer);
+}
 
 let overlayColors = {
     marginBox: `hsla(${180}, 100%, 50%, 1)`,
