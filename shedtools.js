@@ -5,66 +5,64 @@
 // toggle vertical grid-lines
 // maybe only being able to lock one?
 
-
-
 let toolsAreActive = false;
 
 const createPseudoBody = () => {
     const documentElRect = document.documentElement.getBoundingClientRect();
-    let pseudoBody = document.createElement('div');
+    let pseudoBody = document.createElement("div");
 
-    pseudoBody.id = 'shed_tools_-_pseudo_body';
-    pseudoBody.style.position = 'absolute';
+    pseudoBody.id = "shed_tools_-_pseudo_body";
+    pseudoBody.style.position = "absolute";
     pseudoBody.style.zIndex = 10000000;
     pseudoBody.style.top = 0;
     pseudoBody.style.left = 0;
-    pseudoBody.style.height = documentElRect.height + 'px';
-    pseudoBody.style.width = documentElRect.width + 'px';
-    pseudoBody.style.pointerEvents = 'none';
+    pseudoBody.style.height = documentElRect.height + "px";
+    pseudoBody.style.width = documentElRect.width + "px";
+    pseudoBody.style.pointerEvents = "none";
 
     document.body.appendChild(pseudoBody);
     return pseudoBody;
-}
+};
 const shedToolsContainer = createPseudoBody();
 
 // Create bar for settings
 const createSettingsBar = () => {
-    let barEl = document.createElement('div');
-    barEl.id = 'shed_tools_-_settings_bar';
+    let barEl = document.createElement("div");
+    barEl.id = "shed_tools_-_settings_bar";
     let s = barEl.style;
 
-    s.background = '#202020';
-    s.borderTop = '1px solid #EEEEEE';
-    s.borderRight = '1px solid #EEEEEE';
-    s.color = '#EEEEEE';
-    s.position = 'fixed';
+    s.background = "#202020";
+    s.borderTop = "1px solid #EEEEEE";
+    s.borderRight = "1px solid #EEEEEE";
+    s.color = "#EEEEEE";
+    s.position = "fixed";
     s.zIndex = 10000001;
     s.bottom = 0;
     s.left = 0;
-    s.borderTopRightRadius = '5px';
-    s.padding = '6px';
+    s.borderTopRightRadius = "5px";
+    s.padding = "6px";
 
     const createOnOff = () => {
-        let onOffEl = document.createElement('input');
-        onOffEl.type = 'checkbox';
-        onOffEl.id = 'shed_tools_-_settings_-_on_off';
-        onOffEl.style.verticalAlign = 'middle';
+        let onOffEl = document.createElement("input");
+        onOffEl.type = "checkbox";
+        onOffEl.id = "shed_tools_-_settings_-_on_off";
+        onOffEl.style.verticalAlign = "middle";
 
         return onOffEl;
-    }
+    };
     const onOff = createOnOff();
 
     const createColorSlider = () => {
-        let sliderEl = document.createElement('input');
-        sliderEl.type = 'range';
+        let sliderEl = document.createElement("input");
+        sliderEl.type = "range";
         sliderEl.min = 0;
         sliderEl.max = 360;
         sliderEl.value = 180;
-        sliderEl.id = 'shed_tools_-_settings_-_color_slider';
-        sliderEl.style.verticalAlign = 'middle';;
+        sliderEl.id = "shed_tools_-_settings_-_color_slider";
+        sliderEl.style.verticalAlign = "middle";
 
         return sliderEl;
-    }
+    };
     const colorSlider = createColorSlider();
 
     barEl.appendChild(onOff);
@@ -72,13 +70,12 @@ const createSettingsBar = () => {
     document.body.appendChild(barEl);
 
     return barEl;
-}
+};
 const settingsBar = createSettingsBar();
-
 
 // Create some styles
 const createStyles = () => {
-    let style = document.createElement('style');
+    let style = document.createElement("style");
     style.textContent = `
         #shed_tools_-_settings_bar input {
             all: revert;
@@ -96,46 +93,46 @@ const createStyles = () => {
         }
     `;
     document.head.append(style);
-}
+};
 createStyles();
 
 const createVerticalGrid = (columnCount, columnWidth, gutterWidth) => {
-    let gridContainer = document.createElement('div');
+    let gridContainer = document.createElement("div");
     let gs = gridContainer.style;
-    gs.display = 'flex';
-    gs.justifyContent = 'center';
-    gs.position = 'fixed';
+    gs.display = "flex";
+    gs.justifyContent = "center";
+    gs.position = "fixed";
     gs.zIndex = 10000000;
     gs.inset = 0;
-    gs.pointerEvents = 'none';
+    gs.pointerEvents = "none";
 
-    let gridContainerInner = document.createElement('div');
-    gridContainerInner.style.display = 'flex';
+    let gridContainerInner = document.createElement("div");
+    gridContainerInner.style.display = "flex";
 
     for (let i = 0; i < columnCount; i++) {
-        let column = document.createElement('div');
-        column.classList.add('shed_tools_-_vertical_grid_-_column');
+        let column = document.createElement("div");
+        column.classList.add("shed_tools_-_vertical_grid_-_column");
         let cs = column.style;
         cs.margin = `0 ${gutterWidth / 2}px`;
-        cs.width = columnWidth + 'px';
-        cs.height = '100%';
+        cs.width = columnWidth + "px";
+        cs.height = "100%";
 
         gridContainerInner.append(column);
     }
 
     gridContainer.append(gridContainerInner);
     document.body.append(gridContainer);
-}
+};
 
 let overlayColors = {
     marginBox: `hsla(${180}, 100%, 50%, 1)`,
     paddingBox: `hsla(${180 + 120}, 100%, 50%, 1)`,
     contentBox: `hsla(${180 + 240}, 100%, 50%, 1)`,
-    setHue: function(num) {
+    setHue: function (num) {
         num = parseInt(num);
         let numB = 120;
         let pBoxHue = num + numB;
-        let cBoxHue = num + (numB * 2);
+        let cBoxHue = num + numB * 2;
 
         if (pBoxHue > 360) {
             pBoxHue -= 360;
@@ -146,74 +143,86 @@ let overlayColors = {
         this.marginBox = `hsla(${num}, 100%, 50%, 1)`;
         this.paddingBox = `hsla(${pBoxHue}, 100%, 50%, 1)`;
         this.contentBox = `hsla(${cBoxHue}, 100%, 50%, 1)`;
-    }
-}
+    },
+};
 
 const getOverlayEl = (currentTarget) => {
     const style = getComputedStyle(currentTarget);
     const elRect = currentTarget.getBoundingClientRect();
 
-    let {   marginTop, marginRight, 
-            marginBottom, marginLeft, paddingTop, 
-            paddingRight, paddingBottom, paddingLeft
-        } = style;
+    let {
+        marginTop,
+        marginRight,
+        marginBottom,
+        marginLeft,
+        paddingTop,
+        paddingRight,
+        paddingBottom,
+        paddingLeft,
+    } = style;
 
-    const idNum = Math.round(Date.now() + (Math.random() * 1000));
-    const wrapperId = 'shed_tools_-_overlay_wrapper_' + idNum;
-    const innerId = 'shed_tools_-_overlay_inner_' + idNum;
+    const idNum = Math.round(Date.now() + Math.random() * 1000);
+    const wrapperId = "shed_tools_-_overlay_wrapper_" + idNum;
+    const innerId = "shed_tools_-_overlay_inner_" + idNum;
 
-    let wrapperEl = document.createElement('div');
-    wrapperEl.style.width = currentTarget.clientWidth + 'px';
-    wrapperEl.style.height = currentTarget.clientHeight + 'px';
-    wrapperEl.style.position = 'absolute';
-    wrapperEl.style.top = elRect.top + window.scrollY  + 'px';
-    wrapperEl.style.left = elRect.left + window.scrollX + 'px';
-    wrapperEl.style.background = 'transparent';
-    wrapperEl.style.opacity = '.5';
+    let wrapperEl = document.createElement("div");
+    wrapperEl.style.width = currentTarget.clientWidth + "px";
+    wrapperEl.style.height = currentTarget.clientHeight + "px";
+    wrapperEl.style.position = "absolute";
+    wrapperEl.style.top = elRect.top + window.scrollY + "px";
+    wrapperEl.style.left = elRect.left + window.scrollX + "px";
+    wrapperEl.style.background = "transparent";
+    wrapperEl.style.opacity = ".5";
     wrapperEl.id = wrapperId;
 
-    let transition = 'all .1s ease';
+    let transition = "all .1s ease";
 
-    let marginBoxDiv = document.createElement('div');
+    let marginBoxDiv = document.createElement("div");
     marginBoxDiv.style.background = overlayColors.marginBox;
-    marginBoxDiv.style.position = 'absolute';
+    marginBoxDiv.style.position = "absolute";
     marginBoxDiv.style.zIndex = -1;
-    marginBoxDiv.style.top = '-' + marginTop;
-    marginBoxDiv.style.right = '-' + marginRight;
-    marginBoxDiv.style.bottom = '-' + marginBottom;
-    marginBoxDiv.style.left = '-' + marginLeft;
-    marginBoxDiv.innerText = 'margin';
+    marginBoxDiv.style.top = "-" + marginTop;
+    marginBoxDiv.style.right = "-" + marginRight;
+    marginBoxDiv.style.bottom = "-" + marginBottom;
+    marginBoxDiv.style.left = "-" + marginLeft;
+    marginBoxDiv.innerText = "margin";
     marginBoxDiv.style.transition = transition;
-    
-    let paddingBoxDiv = document.createElement('div');
+
+    let paddingBoxDiv = document.createElement("div");
     paddingBoxDiv.id = innerId;
     paddingBoxDiv.style.background = overlayColors.paddingBox;
-    paddingBoxDiv.style.width = currentTarget.clientWidth + 'px';
-    paddingBoxDiv.style.height = currentTarget.clientHeight + 'px';
-    paddingBoxDiv.innerText = 'padding';
+    paddingBoxDiv.style.width = currentTarget.clientWidth + "px";
+    paddingBoxDiv.style.height = currentTarget.clientHeight + "px";
+    paddingBoxDiv.innerText = "padding";
     paddingBoxDiv.style.transition = transition;
     // paddingBoxDiv.style.pointerEvents = 'auto';
 
-    let contentBoxDiv = document.createElement('div');
-    contentBoxDiv.style.position = 'absolute';
+    let contentBoxDiv = document.createElement("div");
+    contentBoxDiv.style.position = "absolute";
     contentBoxDiv.style.zIndex = 1;
     contentBoxDiv.style.top = paddingTop;
     contentBoxDiv.style.right = paddingRight;
     contentBoxDiv.style.bottom = paddingBottom;
     contentBoxDiv.style.left = paddingLeft;
     contentBoxDiv.style.background = overlayColors.contentBox;
-    contentBoxDiv.innerText = 'content';
+    contentBoxDiv.innerText = "content";
     contentBoxDiv.style.transition = transition;
 
-    wrapperEl.classList.add('shed_tools_-_overlay', 'shed_tools_-_overlay_wrapper');
-    paddingBoxDiv.classList.add('shed_tools_-_overlay', 'shed_tools_-_overlay_inner');
+    wrapperEl.classList.add(
+        "shed_tools_-_overlay",
+        "shed_tools_-_overlay_wrapper"
+    );
+    paddingBoxDiv.classList.add(
+        "shed_tools_-_overlay",
+        "shed_tools_-_overlay_inner"
+    );
 
     wrapperEl.appendChild(marginBoxDiv);
     wrapperEl.appendChild(paddingBoxDiv);
     wrapperEl.appendChild(contentBoxDiv);
 
     return wrapperEl;
-}
+};
 
 /**
  * Handle overlay existence on mouse over
@@ -223,7 +232,7 @@ const getOverlayEl = (currentTarget) => {
  */
 const toggleOverlay = (a, b) => {
     if (a !== b) {
-        if (a.tagName !== 'BODY') { 
+        if (a.tagName !== "BODY") {
             // check a
             if (!a.shed_tools_overlay) {
                 // create overlay
@@ -231,11 +240,13 @@ const toggleOverlay = (a, b) => {
                 shedToolsContainer.appendChild(newOverlay);
                 a.shed_tools_overlay = newOverlay;
             }
-        };
+        }
 
         // check b
         if (b.shed_tools_overlay) {
-            let bIsLockedOverlay = b.shed_tools_overlay.classList.contains('shed_tools_-_locked_overlay');
+            let bIsLockedOverlay = b.shed_tools_overlay.classList.contains(
+                "shed_tools_-_locked_overlay"
+            );
 
             if (!bIsLockedOverlay) {
                 // remove overlay
@@ -246,15 +257,14 @@ const toggleOverlay = (a, b) => {
     } else {
         return;
     }
-
-}
+};
 
 let mousingOver = {
     now: undefined,
-    last: undefined
-}
+    last: undefined,
+};
 
-document.body.addEventListener('mousemove', e => {
+window.addEventListener("mousemove", (e) => {
     e.stopPropagation();
 
     if (!toolsAreActive) {
@@ -270,13 +280,13 @@ document.body.addEventListener('mousemove', e => {
     }
 
     mousingOver.last = mouseTarget;
-})
+});
 
 // LOCKING
-const lockKey = 'IntlBackslash';
+const lockKey = "IntlBackslash";
 let lockedEl = null; // limit locked els to 1 el
 
-document.body.addEventListener('keydown', e => {
+window.addEventListener("keydown", (e) => {
     e.stopPropagation();
 
     if (!toolsAreActive) {
@@ -284,37 +294,40 @@ document.body.addEventListener('keydown', e => {
     }
 
     let overlay = mousingOver.now.shed_tools_overlay;
-    
+
     if (e.code === lockKey) {
         if (lockedEl === overlay) {
-            overlay.classList.remove('shed_tools_-_locked_overlay');
+            overlay.classList.remove("shed_tools_-_locked_overlay");
             lockedEl = undefined;
-        } else
-        if (!lockedEl) {
-            overlay.classList.add('shed_tools_-_locked_overlay');
+        } else if (!lockedEl) {
+            overlay.classList.add("shed_tools_-_locked_overlay");
             lockedEl = overlay;
         }
     }
-})
+});
 
-settingsBar.querySelector('#shed_tools_-_settings_-_color_slider')
-    .addEventListener('input', e => {
+settingsBar
+    .querySelector("#shed_tools_-_settings_-_color_slider")
+    .addEventListener("input", (e) => {
         overlayColors.setHue(e.target.value);
 
         let overlays = shedToolsContainer.children;
         for (let i = 0; i < overlays.length; i++) {
             let overlay = overlays.item(i);
             overlay.children.item(0).style.background = overlayColors.marginBox;
-            overlay.children.item(1).style.background = overlayColors.paddingBox;
-            overlay.children.item(2).style.background = overlayColors.contentBox;
+            overlay.children.item(1).style.background =
+                overlayColors.paddingBox;
+            overlay.children.item(2).style.background =
+                overlayColors.contentBox;
         }
-    })
+    });
 
-settingsBar.querySelector('#shed_tools_-_settings_-_on_off')
-    .addEventListener('input', e => {
+settingsBar
+    .querySelector("#shed_tools_-_settings_-_on_off")
+    .addEventListener("input", (e) => {
         toolsAreActive = e.target.checked;
 
-        toolsAreActive ?
-        shedToolsContainer.style.display = 'block' :
-        shedToolsContainer.style.display = 'none';
-    })
+        toolsAreActive
+            ? (shedToolsContainer.style.display = "block")
+            : (shedToolsContainer.style.display = "none");
+    });
