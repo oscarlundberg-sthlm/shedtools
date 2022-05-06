@@ -1,10 +1,3 @@
-// "use strict";
-
-// Next thing:
-// measurements? distances?
-// toggle vertical grid-lines
-// maybe only being able to lock one?
-
 let toolsAreActive = false;
 
 const createPseudoBody = () => {
@@ -29,18 +22,6 @@ const shedToolsContainer = createPseudoBody();
 const createSettingsBar = () => {
     let barEl = document.createElement("div");
     barEl.id = "shed_tools_-_settings_bar";
-    let s = barEl.style;
-
-    s.background = "#202020";
-    s.borderTop = "1px solid #EEEEEE";
-    s.borderRight = "1px solid #EEEEEE";
-    s.color = "#EEEEEE";
-    s.position = "fixed";
-    s.zIndex = 10000001;
-    s.bottom = 0;
-    s.left = 0;
-    s.borderTopRightRadius = "5px";
-    s.padding = "6px";
 
     const createOnOff = () => {
         let onOffEl = document.createElement("input");
@@ -65,20 +46,102 @@ const createSettingsBar = () => {
     };
     const colorSlider = createColorSlider();
 
-    barEl.appendChild(onOff);
-    barEl.appendChild(colorSlider);
+    const createVerticalGridSetter = () => {
+        let columnCountInput = document.createElement("input");
+        let columnWidthInput = document.createElement("input");
+        let gutterWidthInput = document.createElement("input");
+        let verticalGridSetterEl = document.createElement("div");
+        verticalGridSetterEl.id =
+            "shed_tools_-_settings_-_vertical_grid_setter";
+
+        columnCountInput.type =
+            columnWidthInput.type =
+            gutterWidthInput.type =
+                "number";
+        columnCountInput.id =
+            "shed_tools_-_settings_-_vertical_grid_column_count";
+        columnWidthInput.id =
+            "shed_tools_-_settings_-_vertical_grid_column_width";
+        gutterWidthInput.id =
+            "shed_tools_-_settings_-_vertical_grid_gutter_width";
+        columnCountInput.placeholder = "Column count";
+        columnWidthInput.placeholder = "Column width";
+        gutterWidthInput.placeholder = "Gutter width";
+
+        verticalGridSetterEl.appendChild(columnCountInput);
+        verticalGridSetterEl.appendChild(columnWidthInput);
+        verticalGridSetterEl.appendChild(gutterWidthInput);
+
+        return verticalGridSetterEl;
+    };
+    const verticalGrid = createVerticalGridSetter();
+
+    const onOffAndSliderWrapper = document.createElement('div');
+    onOffAndSliderWrapper.appendChild(onOff);
+    onOffAndSliderWrapper.appendChild(colorSlider);
+
+    barEl.appendChild(onOffAndSliderWrapper);
+    barEl.appendChild(verticalGrid);
     document.body.appendChild(barEl);
 
     return barEl;
 };
 const settingsBar = createSettingsBar();
 
-// Create some styles
 const createStyles = () => {
     let style = document.createElement("style");
     style.textContent = `
+        #shed_tools_-_settings_bar {
+            background: #202020CC;
+            border-top: 1px solid #EEEEEE;
+            border-right: 1px solid #EEEEEE;
+            color: #EEEEEE;
+            position: fixed;
+            z-index: 10000001;
+            bottom: 0;
+            left: 0;
+            border-radius: 5px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        #shed_tools_-_settings_bar::after {
+            content: 'shed tools by Oscar Lundberg';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+        #shed_tools_-_settings_bar > * {
+            padding: 8px 14px;
+        }
+        #shed_tools_-_settings_bar *:hover::after {
+            background: #888;
+            color: #FFF;
+            padding: 1em;
+            border-radius: 5px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: translateY(-100%);
+        }
+        #shed_tools_-_settings_-_on_off:hover::after {
+            content: "On/off for element selection. Press 'l' to 'lock' a selected element"
+        }
+        #shed_tools_-_settings_-_color_slider:hover::after {
+            content: "Change the selection colors if it's hard to see";
+        }
+        #shed_tools_-_settings_-_vertical_grid_setter:hover::after {
+            content: "Create a vertical grid to check your alignments";
+        }
+        .measure-function-display:hover::after {
+            content: "Measurements. Press 'm' to measure, and again to lock";
+        }
         #shed_tools_-_settings_bar input {
             all: revert;
+        }
+        #shed_tools_-_settings_-_vertical_grid_setter > input {
+            width: 14ch;
         }
         #shed_tools_-_pseudo_body {
             font-family: monospace;
@@ -96,8 +159,22 @@ const createStyles = () => {
 };
 createStyles();
 
+const removeVerticalGrid = () => {
+    const grid = document.querySelector('#shed_tools_-_vertical_grid_-_container_outer');
+    if (!grid) { return };
+    grid.remove();
+}
+
 const createVerticalGrid = (columnCount, columnWidth, gutterWidth) => {
-    let gridContainer = document.createElement("div");
+    removeVerticalGrid();
+    if (!columnCount || !columnWidth || !gutterWidth) {
+        return;
+    }
+
+    let gridContainer, gridContainerInner;
+
+    gridContainer = document.createElement("div");
+    gridContainer.id = "shed_tools_-_vertical_grid_-_container_outer";
     let gs = gridContainer.style;
     gs.display = "flex";
     gs.justifyContent = "center";
@@ -106,7 +183,8 @@ const createVerticalGrid = (columnCount, columnWidth, gutterWidth) => {
     gs.inset = 0;
     gs.pointerEvents = "none";
 
-    let gridContainerInner = document.createElement("div");
+    gridContainerInner = document.createElement("div");
+    gridContainerInner.id = "shed_tools_-_vertical_grid_-_container_inner";
     gridContainerInner.style.display = "flex";
 
     for (let i = 0; i < columnCount; i++) {
@@ -122,7 +200,8 @@ const createVerticalGrid = (columnCount, columnWidth, gutterWidth) => {
 
     gridContainer.append(gridContainerInner);
     document.body.append(gridContainer);
-};
+}
+
 
 let overlayColors = {
     marginBox: `hsla(${180}, 100%, 50%, 1)`,
@@ -283,7 +362,7 @@ window.addEventListener("mousemove", (e) => {
 });
 
 // LOCKING
-const lockKey = "IntlBackslash";
+const lockKey = "l";
 let lockedEl = null; // limit locked els to 1 el
 
 window.addEventListener("keydown", (e) => {
@@ -295,7 +374,7 @@ window.addEventListener("keydown", (e) => {
 
     let overlay = mousingOver.now.shed_tools_overlay;
 
-    if (e.code === lockKey) {
+    if (e.key === lockKey) {
         if (lockedEl === overlay) {
             overlay.classList.remove("shed_tools_-_locked_overlay");
             lockedEl = undefined;
@@ -331,3 +410,127 @@ settingsBar
             ? (shedToolsContainer.style.display = "block")
             : (shedToolsContainer.style.display = "none");
     });
+
+const verticalGridValues = {
+    columnCount: 0,
+    columnWidth: 0,
+    gutterWidth: 0,
+}
+settingsBar
+    .querySelector("#shed_tools_-_settings_-_vertical_grid_setter")
+    .addEventListener("input", (e) => {
+
+        switch (e.target.id) {
+            case "shed_tools_-_settings_-_vertical_grid_column_count":
+                verticalGridValues.columnCount = e.target.value;
+                break;
+            case "shed_tools_-_settings_-_vertical_grid_column_width":
+                verticalGridValues.columnWidth = e.target.value;
+                break;
+            case "shed_tools_-_settings_-_vertical_grid_gutter_width":
+                verticalGridValues.gutterWidth = e.target.value;
+                break;
+        
+            default:
+                break;
+        }
+        createVerticalGrid(verticalGridValues.columnCount, verticalGridValues.columnWidth, verticalGridValues.gutterWidth);
+    });
+
+const measure = {
+    displayEl: undefined,
+    styleEl: undefined,
+    measuring: false,
+    p1: undefined,
+    p2: undefined,
+    pointStart: {
+        x: 0,
+        y: 0,
+    },
+    pointEnd: {
+        x: 0,
+        y: 0,
+    },
+    diff(end, start) {
+        return end - start;
+    },
+    mouseMoveHandlerMeasure(e) {
+        if (this.measuring && !this.pointStart.x && !this.pointStart.y) {
+            this.pointStart = {
+                x: e.x,
+                y: e.y,
+            };
+        }
+        if (this.measuring) {
+            this.pointEnd = {
+                x: e.x,
+                y: e.y,
+            };
+        }
+        this.p1.innerText = `x: ${this.diff(
+            this.pointEnd.x,
+            this.pointStart.x
+        )}px`;
+        this.p2.innerText = `y: ${this.diff(
+            this.pointEnd.y,
+            this.pointStart.y
+        )}px`;
+    },
+    keyDownHandlerMeasure(e) {
+        if (e.key === "m") {
+            this.measuring = !this.measuring;
+            if (this.measuring) {
+                this.pointStart = {
+                    x: 0,
+                    y: 0,
+                };
+            }
+        }
+    },
+    mouseMoveListener: undefined,
+    keyDownListener: undefined,
+    init() {
+        this.displayEl = document.createElement("div");
+        this.displayEl.className = "measure-function-display";
+        const settingsBar = document.querySelector("#shed_tools_-_settings_bar");
+        settingsBar.appendChild(this.displayEl);
+
+        // const h4 = document.createElement("h4");
+        this.p1 = document.createElement("p");
+        this.p2 = document.createElement("p");
+        // h4.innerText = "Press 'm' to measure";
+        this.p1.innerText = `x: 0px`;
+        this.p2.innerText = `y: 0px`;
+        // this.displayEl.appendChild(h4);
+        this.displayEl.appendChild(this.p1);
+        this.displayEl.appendChild(this.p2);
+
+        this.mouseMoveListener = this.mouseMoveHandlerMeasure.bind(this);
+        this.keyDownListener = this.keyDownHandlerMeasure.bind(this);
+
+        window.addEventListener("mousemove", this.mouseMoveListener);
+        window.addEventListener("keydown", this.keyDownListener);
+
+        const style = `
+            .measure-function-display > * {
+                all: initial;
+                display: block;
+                font-family: monospace;
+                font-size: 12px;
+                color: #DDDDDD;
+            }
+        `;
+
+        this.styleEl = document.createElement("style");
+        this.styleEl.textContent = style;
+        document.head.appendChild(this.styleEl);
+    },
+    remove() {
+        window.removeEventListener("mousemove", this.mouseMoveListener);
+        window.removeEventListener("keydown", this.keyDownListener);
+        this.styleEl.remove();
+        this.displayEl.remove();
+    },
+};
+
+measure.init();
