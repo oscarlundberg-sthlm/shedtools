@@ -1,4 +1,4 @@
-# shedtools
+# shed tools
 
 Some things I've been missing in dev tools when doing frontend development.
 
