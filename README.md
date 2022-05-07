@@ -1,5 +1,8 @@
 # shed tools
-
+---
+To use, put this code inside the head tag:  
+`<script src="https://cdn.jsdelivr.net/gh/oscarlundberg-sthlm/shedtools/shedtools.js" defer></script>`
+---
 Some things I've been missing in dev tools when doing frontend development.
 
 - Being able to measure distances on screen in pixels.
