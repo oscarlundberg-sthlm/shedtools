@@ -1,6 +1,7 @@
+They're hacky, they're basic, they're...
 # shed tools  
 
-Some things I've been missing in dev tools when doing frontend development.
+Shed tools are basically some things I've been missing in dev tools when doing frontend development:
 
 - Being able to measure distances on screen in pixels.
 - Being able to create vertical grids overlaying the website.
