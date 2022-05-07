@@ -18,10 +18,24 @@ const createPseudoBody = () => {
 };
 const shedToolsContainer = createPseudoBody();
 
+const badge = {
+    text: 'shed tools',
+    link: 'https://github.com/oscarlundberg-sthlm/shedtools',
+    genLink() {
+        return `<a href="${this.link}" target="_blank" rel="noopener">${this.text}</a>`;
+    },
+    genWrapperDiv() {
+        const div = document.createElement('div');
+        div.id = "shed_tools_-_badge_wrapper";
+        div.innerHTML = this.genLink();
+        return div;
+    }
+}
+
 // Create bar for settings
 const createSettingsBar = () => {
-    let barEl = document.createElement("div");
-    barEl.id = "shed_tools_-_settings_bar";
+    let settingsBar = document.createElement("div");
+    settingsBar.id = "shed_tools_-_settings_bar";
 
     const createOnOff = () => {
         let onOffEl = document.createElement("input");
@@ -80,11 +94,12 @@ const createSettingsBar = () => {
     onOffAndSliderWrapper.appendChild(onOff);
     onOffAndSliderWrapper.appendChild(colorSlider);
 
-    barEl.appendChild(onOffAndSliderWrapper);
-    barEl.appendChild(verticalGrid);
-    document.body.appendChild(barEl);
+    settingsBar.appendChild(onOffAndSliderWrapper);
+    settingsBar.appendChild(verticalGrid);
+    settingsBar.appendChild(badge.genWrapperDiv());
+    document.body.appendChild(settingsBar);
 
-    return barEl;
+    return settingsBar;
 };
 const settingsBar = createSettingsBar();
 
@@ -93,27 +108,23 @@ const createStyles = () => {
     style.textContent = `
         #shed_tools_-_settings_bar {
             background: #202020CC;
-            border-top: 1px solid #EEEEEE;
-            border-right: 1px solid #EEEEEE;
             color: #EEEEEE;
+            border: 1px outset #EEEEEE;
+            border-radius: 5px;
             position: fixed;
             z-index: 10000001;
             bottom: 0;
             left: 0;
-            border-radius: 5px;
-            padding-top: 8px;
-            padding-bottom: 8px;
+            padding: 12px;
             font-family: monospace;
             font-size: 12px;
-        }
-        #shed_tools_-_settings_bar::after {
-            content: 'shed tools by Oscar Lundberg';
-            position: absolute;
-            bottom: 0;
-            right: 0;
+            cursor: move;
         }
         #shed_tools_-_settings_bar > * {
-            padding: 8px 14px;
+            cursor: auto;
+        }
+        #shed_tools_-_settings_bar > *:not(:last-child) {
+            padding-bottom: 8px;
         }
         #shed_tools_-_settings_bar *:hover::after {
             background: #888;
@@ -124,6 +135,15 @@ const createStyles = () => {
             top: 0;
             left: 0;
             transform: translateY(-100%);
+        }
+        #shed_tools_-_badge_wrapper {
+            position: absolute;
+            bottom: 0;
+            right: 14px;
+        }
+        #shed_tools_-_badge_wrapper a {
+            all: unset;
+            cursor: pointer;
         }
         #shed_tools_-_settings_-_on_off:hover::after {
             content: "On/off for element selection. Press 'l' to 'lock' a selected element"
@@ -534,3 +554,61 @@ const measure = {
 };
 
 measure.init();
+
+const moveSettingsBar = (settingsBar) => {
+    const mousePosition = {
+        start: {
+            x: 0,
+            y: 0,
+        },
+        end: {
+            x: 0,
+            y: 0,
+        },
+        diff() {
+            return {
+                x: this.end.x - this.start.x,
+                y: this.end.y - this.start.y,
+            }
+        }
+    }
+
+    const moveBar = (x, y) => {
+        settingsBar.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    const mouseUpHandler = e => {
+        window.removeEventListener('mousemove', mouseMoveHandler);
+
+        settingsBarRect = settingsBar.getBoundingClientRect();
+        settingsBar.style.left = settingsBarRect.left + 'px';
+        settingsBar.style.top = settingsBarRect.top + 'px';
+        settingsBar.style.bottom = 'unset';
+        settingsBar.style.transform = '';
+
+        window.removeEventListener('mouseup', mouseUpHandler);
+    }
+
+    const mouseMoveHandler = e => {
+        mousePosition.end.x = e.clientX;
+        mousePosition.end.y = e.clientY;
+
+        moveBar(mousePosition.diff().x, mousePosition.diff().y);
+    }
+
+    const mouseDownHandler = e => {
+        if (e.target !== e.currentTarget) {
+            return;
+        }
+
+        mousePosition.start.x = e.clientX;
+        mousePosition.start.y = e.clientY;
+
+        window.addEventListener('mousemove', mouseMoveHandler);
+        window.addEventListener('mouseup', mouseUpHandler);
+    }
+
+    settingsBar.addEventListener('mousedown', mouseDownHandler);
+}
+
+moveSettingsBar(settingsBar);
