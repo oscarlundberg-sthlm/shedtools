@@ -1,5 +1,4 @@
 # shed tools
----  
 
 To use, put this code inside the head tag:  
 `<script src="https://cdn.jsdelivr.net/gh/oscarlundberg-sthlm/shedtools/shedtools.js" defer></script>`
