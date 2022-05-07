@@ -97,6 +97,7 @@ const createSettingsBar = () => {
     settingsBar.appendChild(onOffAndSliderWrapper);
     settingsBar.appendChild(verticalGrid);
     settingsBar.appendChild(badge.genWrapperDiv());
+    
     document.body.appendChild(settingsBar);
 
     return settingsBar;
@@ -107,6 +108,8 @@ const createStyles = () => {
     let style = document.createElement("style");
     style.textContent = `
         #shed_tools_-_settings_bar {
+            all: unset;
+            display: block;
             background: #202020CC;
             color: #EEEEEE;
             border: 1px outset #EEEEEE;
@@ -120,6 +123,14 @@ const createStyles = () => {
             font-size: 12px;
             cursor: move;
         }
+        #shed_tools_-_settings_bar *,
+        #shed_tools_-_settings_bar *::after, {
+            all: initial;
+            display: block;
+            font-family: monospace;
+            font-size: 12px;
+            color: #EEEEEE;
+        }
         #shed_tools_-_settings_bar > * {
             cursor: auto;
         }
@@ -127,7 +138,10 @@ const createStyles = () => {
             padding-bottom: 8px;
         }
         #shed_tools_-_settings_bar *:hover::after {
+            all: initial;
+            display: block;
             background: #888;
+            font-family: monospace;
             color: #FFF;
             padding: 1em;
             border-radius: 5px;
@@ -154,14 +168,24 @@ const createStyles = () => {
         #shed_tools_-_settings_-_vertical_grid_setter:hover::after {
             content: "Create a vertical grid to check your alignments";
         }
-        .measure-function-display:hover::after {
+        #shed_tools_-_settings_measure:hover::after {
             content: "Measurements. Press 'm' to measure, and again to lock";
         }
         #shed_tools_-_settings_bar input {
             all: revert;
+            font-family: monospace;
+            font-size: 12px;
+            color: #000;
         }
         #shed_tools_-_settings_-_vertical_grid_setter > input {
             width: 14ch;
+        }
+        #shed_tools_-_settings_measure > * {
+            all: initial;
+            display: block;
+            font-family: monospace;
+            font-size: 12px;
+            color: #DDDDDD;
         }
         #shed_tools_-_pseudo_body {
             font-family: monospace;
@@ -511,17 +535,17 @@ const measure = {
     keyDownListener: undefined,
     init() {
         this.displayEl = document.createElement("div");
-        this.displayEl.className = "measure-function-display";
+        this.displayEl.id = "shed_tools_-_settings_measure";
         const settingsBar = document.querySelector("#shed_tools_-_settings_bar");
         settingsBar.appendChild(this.displayEl);
 
-        // const h4 = document.createElement("h4");
+
         this.p1 = document.createElement("p");
         this.p2 = document.createElement("p");
-        // h4.innerText = "Press 'm' to measure";
+
         this.p1.innerText = `x: 0px`;
         this.p2.innerText = `y: 0px`;
-        // this.displayEl.appendChild(h4);
+
         this.displayEl.appendChild(this.p1);
         this.displayEl.appendChild(this.p2);
 
@@ -530,20 +554,6 @@ const measure = {
 
         window.addEventListener("mousemove", this.mouseMoveListener);
         window.addEventListener("keydown", this.keyDownListener);
-
-        const style = `
-            .measure-function-display > * {
-                all: initial;
-                display: block;
-                font-family: monospace;
-                font-size: 12px;
-                color: #DDDDDD;
-            }
-        `;
-
-        this.styleEl = document.createElement("style");
-        this.styleEl.textContent = style;
-        document.head.appendChild(this.styleEl);
     },
     remove() {
         window.removeEventListener("mousemove", this.mouseMoveListener);
