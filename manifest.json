@@ -1,0 +1,23 @@
+{
+    "name": "Shed Tools",
+    "description": "Frontend helper tools. Vertical grids, measurements and more.",
+    "author": "Oscar Lundberg",
+    "icons": {
+        "16": "icon_w16.png",
+        "32": "icon_w32.png",
+        "48": "icon_w48.png",
+        "128": "icon_w128.png"
+    },
+    "manifest_version": 3,
+    "version": "0.0.1",
+    "permissions": [
+      "activeTab",
+      "scripting"
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "action": {
+
+    }
+  }
