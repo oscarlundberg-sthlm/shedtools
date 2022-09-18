@@ -382,6 +382,40 @@ const toggleOverlay = (a, b) => {
     }
 };
 
+// Visual measurement
+const canvasHandler = {
+    canvas: undefined,
+    ctx: undefined,
+    insert: function() {
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = shedToolsContainer.getBoundingClientRect().width;
+        this.canvas.height = shedToolsContainer.getBoundingClientRect().height;
+        this.canvas.style.position = "fixed";
+        this.canvas.style.inset = 0;
+        shedToolsContainer.appendChild(this.canvas);
+        this.ctx = this.canvas.getContext("2d");
+        this.ctx.shadowColor = '#FFF';
+        this.ctx.shadowOffsetX = 1;
+        this.ctx.shadowOffsetY = 1;
+        this.ctx.shadowBlur = 0;
+    },
+    remove: function() {
+        this.canvas.remove();
+    },
+    drawStart: function({ xStart = 0, yStart = 0 }) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(xStart, yStart);
+    },
+    drawEnd: function({ xEnd = 0, yEnd = 0, }) {
+        this.ctx.lineTo(xEnd, yEnd);
+        this.ctx.closePath();
+        this.ctx.stroke();
+    },
+    drawClear: function() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
 let mousingOver = {
     now: undefined,
     last: undefined,
@@ -519,6 +553,18 @@ const measure = {
             this.pointEnd.y,
             this.pointStart.y
         )}px`;
+
+        if (canvasHandler.canvas && canvasHandler.ctx) {
+            canvasHandler.drawClear();
+            canvasHandler.drawStart({ 
+                xStart: this.pointStart.x, 
+                yStart: this.pointStart.y
+            })
+            canvasHandler.drawEnd({
+                xEnd: this.pointEnd.x,
+                yEnd: this.pointEnd.y
+            })
+        }
     },
     keyDownHandlerMeasure(e) {
         if (e.key === "m") {
@@ -539,6 +585,7 @@ const measure = {
         const settingsBar = document.querySelector("#shed_tools_-_settings_bar");
         settingsBar.appendChild(this.displayEl);
 
+        canvasHandler.insert();
 
         this.p1 = document.createElement("p");
         this.p2 = document.createElement("p");
@@ -560,6 +607,7 @@ const measure = {
         window.removeEventListener("keydown", this.keyDownListener);
         this.styleEl.remove();
         this.displayEl.remove();
+        canvasHandler.remove();
     },
 };
 
